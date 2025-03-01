@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: new-book-shook-frontend
+    env: node
+    buildCommand: cd frontend && yarn install && yarn build
+    startCommand: cd frontend && yarn start
+    rootDir: /
+    plan: free

@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import Loader from "../components/Loader";
 import Error from "../components/Error";
@@ -8,48 +9,45 @@ import StripeCheckout from "react-stripe-checkout";
 
 const Bookingscreen = () => {
   const { roomid, fromdate, todate } = useParams();
-  const [loading, setLoading] = useState(false); // ✅ Proper initialization
-  const [room, setRoom] = useState(null);
-  const [error, setError] = useState(false);
+  const [loading, setloading] = useState();
+  const [room, setroom] = useState(null);
+  const [error, setError] = useState();
   const [totalamount, setTotalAmount] = useState(0);
 
   const fromDateObj = moment(fromdate, "DD-MM-YYYY");
   const toDateObj = moment(todate, "DD-MM-YYYY");
   const totaldays = toDateObj.diff(fromDateObj, "days") + 1;
+  // setTotalAmount(totaldays * room.rentperday);
 
   useEffect(() => {
     const fetchRoomById = async () => {
       try {
-        setLoading(true);
-        const response = await axios.post("/api/rooms/getroombyid", { roomid });
+        setloading(true);
+        const response = await axios.post("/api/rooms/getroombyid", { roomid }); // Corrected endpoint and payload
         const data = response.data;
-        setRoom(data);
-        setTotalAmount(totaldays * data.rentperday);
+        setroom(data);
+        setloading(false);
+
+        setTotalAmount(totaldays * data.rentperday); // Calculate total amount here
+        setloading(false);
       } catch (error) {
         console.error("Error fetching room:", error);
+        setloading(false);
         setError(true);
-      } finally {
-        setLoading(false);
       }
     };
 
     if (roomid) {
       fetchRoomById();
     }
-  }, [roomid, totaldays]); // ✅ Added `totaldays` dependency
+  }, [roomid]);
 
-  async function onToken(token) {
+
+ async function onToken(token) {
     console.log(token);
-    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-
-    if (!currentUser) {
-      alert("Please log in to book a room.");
-      return;
-    }
-
     const bookingDetails = {
       room,
-      userid: currentUser._id,
+      userid: JSON.parse(localStorage.getItem("currentUser"))._id,
       fromdate,
       todate,
       totalamount,
@@ -58,50 +56,45 @@ const Bookingscreen = () => {
     };
 
     try {
-      setLoading(true);
       const result = await axios.post("/api/bookings/bookroom", bookingDetails);
-      console.log("Booking Success:", result.data);
-      alert("Booking successful!");
-    } catch (error) {
-      console.log("Booking Error:", error);
-      alert("Booking failed! Please try again.");
-    } finally {
-      setLoading(false);
+    } catch(error){
+      console.log(error);
     }
   }
 
+  // roomid will be undefined during initial render, handle appropriately
   if (!roomid) {
-    return <Loader />;
+    return (
+      <div>
+        <Loader />
+      </div>
+    );
   }
 
   return (
     <div>
       {loading ? (
         <Loader />
-      ) : error ? (
-        <Error />
       ) : room ? (
         <div className="m-5">
           <div className="row justify-content-center mt-5 bs">
             <div className="col-md-6">
               <h1>{room.name}</h1>
-              {/* ✅ Handle missing `imageurls` to prevent crash */}
-              <img
-                src={room.imageurls?.[0] || "default-image.jpg"}
-                className="bigimg"
-                alt={room.name}
-              />
+              <img src={room.imageurls[0]} className="bigimg" alt="" />
             </div>
 
             <div className="col-md-6">
               <h1 style={{ textAlign: "right" }}>Booking Details</h1>
               <hr />
+
               <div style={{ textAlign: "right" }}>
                 <b>
-                  <p>Name: {JSON.parse(localStorage.getItem("currentUser"))?.name || "Guest"}</p>
-                  <p>From Date: {fromdate}</p>
-                  <p>To Date: {todate}</p>
-                  <p>Max Count: {room.maxcount}</p>
+                  <p>
+                    Name: {JSON.parse(localStorage.getItem("currentUser")).name}{" "}
+                  </p>
+                  <p>From Date : {fromdate}</p>
+                  <p>To Date : {todate}</p>
+                  <p>Max Count : {room.maxcount}</p>
                 </b>
               </div>
 
@@ -109,9 +102,9 @@ const Bookingscreen = () => {
                 <h1>Amount</h1>
                 <hr />
                 <b>
-                  <p>Total days: {totaldays}</p>
-                  <p>Rent per day: {room.rentperday}</p>
-                  <p>Total Amount: {totalamount}</p>
+                  <p>Total days : {totaldays}</p>
+                  <p>Rent per day :{room.rentperday}</p>
+                  <p>Total Amount :{totalamount}</p>
                 </b>
               </div>
 

@@ -1,18 +1,22 @@
 import React from "react";
+import { Link } from "react-router-dom"; // ✅ Import Link
 
 const Navbar = () => {
   const user = JSON.parse(localStorage.getItem("currentUser"));
 
-  function logout(){
-    localStorage.removeItem('currentUser');
-    window.location.href='/login';
+  function logout() {
+    localStorage.removeItem("currentUser");
+    window.location.href = "/login";
   }
+
   return (
     <div>
-      <nav className="navbar navbar-expand-lg ">
-        <a className="navbar-brand" href="#">
-        ＢｏｏｋＳｈｏｏｋ
-        </a>
+      <nav className="navbar navbar-expand-lg">
+        {/* ✅ Use Link instead of <a href="#"> */}
+        <Link className="navbar-brand" to="/">
+          ＢｏｏｋＳｈｏｏｋ
+        </Link>
+
         <button
           className="navbar-toggler"
           type="button"
@@ -22,31 +26,36 @@ const Navbar = () => {
           aria-expanded="false"
           aria-label="Toggle navigation"
         >
-        <span className="navbar-toggler-icon" ><i className="fa-solid fa-bars" style={{color: 'white'}}></i></span>
+          <span className="navbar-toggler-icon">
+            <i className="fa-solid fa-bars" style={{ color: "white" }}></i>
+          </span>
         </button>
+
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav">
             {user ? (
               <>
-                <div class="dropdown">
+                <div className="dropdown">
                   <button
-                    class="btn btn-secondary dropdown-toggle"
+                    className="btn btn-secondary dropdown-toggle"
                     type="button"
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
                   >
-                     <i class="fa-solid fa-user"></i>{user.name}
+                    <i className="fa-solid fa-user"></i> {user.name}
                   </button>
-                  <ul class="dropdown-menu">
-                  <li>
-                   <a href="/profile">
-                   Profile
-                   </a>
-                   </li>
+                  <ul className="dropdown-menu">
+                    {/* ✅ Use Link instead of <a> */}
                     <li>
-                      <a class="dropdown-item" href="#" onClick={logout}>
+                      <Link className="dropdown-item" to="/profile">
+                        Profile
+                      </Link>
+                    </li>
+                    <li>
+                      {/* ✅ Replace <a> with <button> */}
+                      <button className="dropdown-item" onClick={logout}>
                         Logout
-                      </a>
+                      </button>
                     </li>
                   </ul>
                 </div>
@@ -54,14 +63,14 @@ const Navbar = () => {
             ) : (
               <>
                 <li className="nav-item active">
-                  <a className="nav-link" href="/register">
+                  <Link className="nav-link" to="/register">
                     Register
-                  </a>
+                  </Link>
                 </li>
                 <li className="nav-item">
-                  <a className="nav-link" href="/login">
+                  <Link className="nav-link" to="/login">
                     Login
-                  </a>
+                  </Link>
                 </li>
               </>
             )}

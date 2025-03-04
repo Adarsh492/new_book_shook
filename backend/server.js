@@ -3,7 +3,7 @@ const cors = require('cors');
 const app = express();
 
 const corsOptions = {
-    origin: ["http://localhost:5000", "http://localhost:3000"],
+    origin: ["https://bookshook-backend.onrender.com", "https://new-book-shook.vercel.app"],
     methods: ["GET", "POST", "PUT", "DELETE"],
 };
 app.use(cors(corsOptions));

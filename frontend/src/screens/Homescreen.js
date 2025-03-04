@@ -21,7 +21,9 @@ const Homescreen = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get("/api/rooms/getallrooms");
+        const response = await axios.get(
+          "https://bookshook-backend.onrender.com/api/rooms/getallrooms"
+        );
         const data = response.data;
 
         setRooms(data);
@@ -47,13 +49,17 @@ const Homescreen = () => {
     }
 
     const filteredRooms = duplicateRooms.filter((room) => {
+      if (!room.currentbookings || room.currentbookings.length === 0) {
+        return true; // No bookings, so the room is available
+      }
+
       const hasBookings = room.currentbookings.some((booking) => {
         const bookingStartDate = moment(booking.fromdate, "DD-MM-YYYY");
         const bookingEndDate = moment(booking.todate, "DD-MM-YYYY");
 
         return (
-          (moment(startDate, "DD-MM-YYYY").isBetween(bookingStartDate, bookingEndDate, undefined, "[]") ||
-            moment(endDate, "DD-MM-YYYY").isBetween(bookingStartDate, bookingEndDate, undefined, "[]")) ||
+          moment(startDate, "DD-MM-YYYY").isBetween(bookingStartDate, bookingEndDate, undefined, "[]") ||
+          moment(endDate, "DD-MM-YYYY").isBetween(bookingStartDate, bookingEndDate, undefined, "[]") ||
           moment(startDate, "DD-MM-YYYY").isSame(bookingStartDate, "day") ||
           moment(endDate, "DD-MM-YYYY").isSame(bookingEndDate, "day")
         );
@@ -104,6 +110,8 @@ const Homescreen = () => {
       <div className="row justify-content-center mt-5">
         {loading ? (
           <Loader />
+        ) : error ? (
+          <Error />
         ) : rooms.length > 0 ? (
           rooms.map((room, index) => (
             <div className="col-md-9 mt-2" key={index}>
@@ -111,7 +119,7 @@ const Homescreen = () => {
             </div>
           ))
         ) : (
-          <Error />
+          <h3 className="text-center mt-5">No rooms available for the selected dates or search query.</h3>
         )}
       </div>
     </div>

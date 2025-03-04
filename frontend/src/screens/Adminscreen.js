@@ -4,6 +4,8 @@ import axios from 'axios';
 
 const { TabPane } = Tabs;
 
+const BASE_URL = 'https://bookshook-backend.onrender.com';
+
 function Adminscreen() {
   const [roomData, setRoomData] = useState({
     name: '',
@@ -27,7 +29,7 @@ function Adminscreen() {
 
   const fetchBookings = async () => {
     try {
-      const response = await axios.get('/api/bookings/getallbookings');
+      const response = await axios.get(`${BASE_URL}/api/bookings/getallbookings`);
       setBookings(response.data);
     } catch (error) {
       console.error('Error fetching bookings', error);
@@ -36,7 +38,7 @@ function Adminscreen() {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('/api/users/getallusers');
+      const response = await axios.get(`${BASE_URL}/api/users/getallusers`);
       setUsers(response.data);
     } catch (error) {
       console.error('Error fetching users', error);
@@ -45,7 +47,7 @@ function Adminscreen() {
 
   const fetchRooms = async () => {
     try {
-      const response = await axios.get('/api/rooms/getallrooms');
+      const response = await axios.get(`${BASE_URL}/api/rooms/getallrooms`);
       setRooms(response.data);
     } catch (error) {
       console.error('Error fetching rooms', error);
@@ -71,7 +73,7 @@ function Adminscreen() {
         phonenumber: Number(roomData.phonenumber),  // Convert to number
       };
 
-      const response = await axios.post('http://localhost:5000/api/rooms/addroom', roomPayload);
+      const response = await axios.post(`${BASE_URL}/api/rooms/addroom`, roomPayload);
       alert(response.data.message);
 
       setRoomData({ // Reset input fields after adding room

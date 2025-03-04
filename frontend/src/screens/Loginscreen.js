@@ -1,65 +1,63 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "./screen.css";
 import Loader from "../components/Loader";
 import Error from "../components/Error";
 import axios from "axios";
 
 const Loginscreen = () => {
-  const [email, setemail] = useState("");
-  const [password, setpassword] = useState("");
-  const [loading, setloading] = useState();
-  const [error, setError] = useState();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   async function login() {
-    const user = {
-      email,
-      password,
+    if (!email || !password) {
+      alert("Please enter email and password.");
+      return;
     }
-    try {
-      setloading(true);
-      const result = (await axios.post('/api/users/login', user)).data;
-      setloading(false);
 
-      localStorage.setItem('currentUser', JSON.stringify(result));
-      window.location.href= '/home';
-    }
-    catch (error) {
+    const user = { email, password };
+
+    try {
+      setLoading(true);
+      const result = (
+        await axios.post("https://bookshook-backend.onrender.com/api/users/login", user)
+      ).data;
+      setLoading(false);
+
+      localStorage.setItem("currentUser", JSON.stringify(result));
+      window.location.href = "/home";
+    } catch (error) {
       console.log(error);
-      setloading(false);
+      setLoading(false);
       setError(true);
     }
   }
+
   return (
     <div>
-      {loading && (<Loader/>)}
+      {loading && <Loader />}
       <div className="row justify-content-center mt-5">
         <div className="col-md-5 mt-5">
-          {error && <Error message = "Invalid Credentials"/>}
+          {error && <Error message="Invalid Credentials" />}
           <div className="bs">
             <h1 id="h_one">Login</h1>
             <input
-              type="Email"
+              type="email"
               className="form-control"
-              placeholder="email"
+              placeholder="Email"
               value={email}
-              onChange={(e) => {
-                setemail(e.target.value);
-              }}
+              onChange={(e) => setEmail(e.target.value)}
             />
             <input
               type="password"
               className="form-control"
-              placeholder="password"
+              placeholder="Password"
               value={password}
-              onChange={(e) => {
-                setpassword(e.target.value);
-              }}
+              onChange={(e) => setPassword(e.target.value)}
             />
             <div className="button">
-              <button
-                className="btn btn-primary mt-3 justify-content"
-                onClick={login}
-              >
+              <button className="btn btn-primary mt-3" onClick={login}>
                 Login
               </button>
             </div>
